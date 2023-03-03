@@ -52,6 +52,7 @@ class Categorias extends Table{
                 "catid" => $catid
             )
         );
+        return $rowsDeleted;
     }
     public static function findAll(){
         $sqlstr = "SELECT * from categorias;";
