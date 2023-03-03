@@ -28,11 +28,30 @@ class Categorias extends Table{
         );
         return $rowsInserted;
     }
-    public static function update(){
-
+    public static function update(
+        string $catnom,
+        string $catest,
+        int $catid
+    ){
+        $sqlstr = "UPDATE categorias set catnom = :catnom, catest = :catest where catid=:catid;";
+        $rowsUpdated = self::executeNonQuery(
+            $sqlstr,
+            array(
+                "catnom" => $catnom,
+                "catest" => $catest,
+                "catid" => $catid
+            )
+        );
+        return $rowsUpdated;
     }
-    public static function delete(){
-
+    public static function delete(int $catid){
+        $sqlstr = "DELETE from categorias where catid=:catid;";
+        $rowsDeleted = self::executeNonQuery(
+            $sqlstr,
+            array(
+                "catid" => $catid
+            )
+        );
     }
     public static function findAll(){
         $sqlstr = "SELECT * from categorias;";
@@ -41,7 +60,14 @@ class Categorias extends Table{
     public static function findByFilter(){
 
     }
-    public static function findById(){
-
+    public static function findById(int $catid){
+        $sqlstr = "SELECT * from categorias where catid = :catid;";
+        $row = self::obtenerUnRegistro(
+            $sqlstr,
+            array(
+                "catid"=> $catid
+            )
+        );
+        return $row;
     }
 }
