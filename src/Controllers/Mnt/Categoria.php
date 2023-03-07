@@ -3,6 +3,8 @@ namespace Controllers\Mnt;
 
 use Controllers\PublicController;
 use Exception;
+use Views\Renderer;
+
 class Categoria extends PublicController{
     private $redirectTo = "index.php?page=Mnt-Categorias";
     private $viewData = array(
@@ -15,7 +17,9 @@ class Categoria extends PublicController{
         "catest_INA" => "",
         "catnom_error"=> "",
         "general_errors"=> array(),
-        "has_errors" =>false
+        "has_errors" =>false,
+        "show_action" => true,
+        "readonly" => false,
     );
     private $modes = array(
         "DSP" => "Detalle de %s (%s)",
@@ -91,7 +95,9 @@ class Categoria extends PublicController{
                 throw new Exception("CatEst incorrect value");
             }
         }else {
-            throw new Exception("CatEst not present in form");
+            if($this->viewData["mode"]!=="DEL") {
+                throw new Exception("CatEst not present in form");
+            }
         }
         if(isset($_POST["mode"])){
             if(!key_exists($_POST["mode"], $this->modes)){
@@ -104,17 +110,19 @@ class Categoria extends PublicController{
             throw new Exception("mode not present in form");
         }
         if(isset($_POST["catid"])){
-            if(!($this->viewData["catid"] !== "INS" && intval($_POST["catid"])>0)){
+            if(($this->viewData["mode"] !== "INS" && intval($_POST["catid"])<=0)){
                 throw new Exception("catId is not Valid");
             }
-            if($this->viewData["catid"]!== $_POST["catid"]){
+            if($this->viewData["catid"]!== intval($_POST["catid"])){
                 throw new Exception("catid value is different from query");
             }
         }else {
             throw new Exception("catid not present in form");
         }
         $this->viewData["catnom"] = $_POST["catnom"];
-        $this->viewData["catest"] = $_POST["catest"];
+        if($this->viewData["mode"]!=="DEL"){
+            $this->viewData["catest"] = $_POST["catest"];
+        }
     }
     private function executeAction(){
         switch($this->viewData["mode"]){
@@ -157,7 +165,31 @@ class Categoria extends PublicController{
         }
     }
     private function render(){
-        
+        if($this->viewData["mode"] === "INS") {
+            $this->viewData["modedsc"] = $this->modes["INS"];
+        } else {
+            $tmpCategorias = \Dao\Mnt\Categorias::findById($this->viewData["catid"]);
+            if(!$tmpCategorias){
+                throw new Exception("Categoria no existe en DB");
+            }
+            //$this->viewData["catnom"] = $tmpCategorias["catnom"];
+            //$this->viewData["catest"] = $tmpCategorias["catest"];
+            \Utilities\ArrUtils::mergeFullArrayTo($tmpCategorias, $this->viewData);
+            $this->viewData["catest_ACT"] = $this->viewData["catest"] === "ACT" ? "selected": "";
+            $this->viewData["catest_INA"] = $this->viewData["catest"] === "INA" ? "selected": "";
+            $this->viewData["modedsc"] = sprintf(
+                $this->modes[$this->viewData["mode"]],
+                $this->viewData["catnom"],
+                $this->viewData["catid"]
+            );
+            if(in_array($this->viewData["mode"], array("DSP","DEL"))){
+                $this->viewData["readonly"] = "readonly";
+            }
+            if($this->viewData["mode"] === "DSP") {
+                $this->viewData["show_action"] = false;
+            }
+        }
+        Renderer::render("mnt/categoria", $this->viewData);
     }
 }
 
