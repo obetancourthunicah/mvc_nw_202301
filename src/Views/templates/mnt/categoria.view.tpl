@@ -8,7 +8,7 @@
     <label for="catid" class="col-4">Código</label>
     <input type="hidden" id="catid" name="catid" value="{{catid}}"/>
     <input type="hidden" id="mode" name="mode" value="{{mode}}"/>
-
+    <input type="hidden"  name="xssToken" value="{{xssToken}}"/>
     <input type="text" readonly name="catiddummy" value="{{catid}}"/>
     </section>
     <section class="row">
