@@ -26,6 +26,12 @@ class Nav {
                 "nav_label" => "Pagar"
             );
         }
+        if (\Utilities\Security::isAuthorized($userID, "Menu_MntCategorias")) {
+            $tmpNAVIGATION[] = array(
+                "nav_url" => "index.php?page=Mnt_Categorias",
+                "nav_label" => "Categorías"
+            );
+        }
         \Utilities\Context::setContext("NAVIGATION", $tmpNAVIGATION);
     }
 
