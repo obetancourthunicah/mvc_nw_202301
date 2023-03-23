@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------
 // Sección de imports
 // ---------------------------------------------------------------
-use Controllers\PublicController;
+use Controllers\PrivateController;
 use Views\Renderer;
 
 /**
@@ -27,7 +27,7 @@ use Views\Renderer;
  * @license  MIT http://
  * @link     http://
  */
-class Journals extends PublicController
+class Journals extends PrivateController
 {
     /**
      * Runs the controller
@@ -39,6 +39,16 @@ class Journals extends PublicController
         // code
         $viewData = array();
         $viewData["journals"] = \Dao\Mnt\Journals::getAll();
+        /* 
+        journals_view
+        journals_edit
+        journals_delete
+        journals_new
+        */
+        $viewData["journals_view"] = $this->isFeatureAutorized('mnt_journals_view');
+        $viewData["journals_edit"] = $this->isFeatureAutorized('mnt_journals_edit');
+        $viewData["journals_delete"] = $this->isFeatureAutorized('mnt_journals_delete');
+        $viewData["journals_new"] = $this->isFeatureAutorized('mnt_journals_new');
 
         Renderer::render("mnt/journals", $viewData);
     }

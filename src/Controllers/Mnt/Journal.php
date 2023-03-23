@@ -1,11 +1,11 @@
 <?php
 namespace Controllers\Mnt;
 
-use Controllers\PublicController;
+use Controllers\PrivateController;
 use Exception;
 use Views\Renderer;
 
-class Journal extends PublicController{
+class Journal extends PrivateController{
     private $redirectTo = "index.php?page=Mnt-Journals";
     private $viewData = array(
         "mode" => "DSP",
@@ -28,6 +28,12 @@ class Journal extends PublicController{
         "INS" => "Nueva Categoría",
         "UPD" => "Editar %s (%s)",
         "DEL" => "Borrar %s (%s)"
+    );
+    private $modesAuth = array(
+        "DSP" => "mnt_journals_view",
+        "INS" => "mnt_journals_new",
+        "UPD" => "mnt_journals_edit",
+        "DEL" => "mnt_journals_delete"
     );
     public function run() :void
     {
@@ -52,9 +58,13 @@ class Journal extends PublicController{
     }
     private function page_loaded()
     {
-        if(isset($_GET['mode'])){
-            if(isset($this->modes[$_GET['mode']])){
-                $this->viewData["mode"] = $_GET['mode'];
+        if (isset($_GET['mode'])) {
+            if (isset($this->modes[$_GET['mode']])) {
+                if (!$this->isFeatureAutorized($this->modesAuth[$_GET['mode']])) {
+                    throw new Exception("Mode is not Authorized!");
+                } else {
+                    $this->viewData["mode"] = $_GET['mode'];
+                }
             } else {
                 throw new Exception("Mode Not available");
             }
@@ -221,5 +231,3 @@ class Journal extends PublicController{
         Renderer::render("mnt/journal", $this->viewData);
     }
 }
-
-?>
